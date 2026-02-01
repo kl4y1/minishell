@@ -6,7 +6,7 @@
 /*   By: mnajem <mnajem@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/21 15:46:04 by mnajem            #+#    #+#             */
-/*   Updated: 2026/01/30 16:48:06 by mnajem           ###   ########.fr       */
+/*   Updated: 2026/02/02 01:46:26 by mnajem           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -74,7 +74,7 @@ void	waitpids(pid_t child1, pid_t child2)
 
 int zspace(char c)
 {
-	if(c < 32)
+	if(c <= 32)
 		return 1;
 	return 0;
 }

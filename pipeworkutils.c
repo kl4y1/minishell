@@ -6,7 +6,7 @@
 /*   By: mnajem <mnajem@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/27 23:22:21 by mnajem            #+#    #+#             */
-/*   Updated: 2026/01/28 00:47:02 by mnajem           ###   ########.fr       */
+/*   Updated: 2026/02/02 01:42:57 by mnajem           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,7 +45,7 @@ void	pid_add_back(t_pid **pid_list, t_pid *node)
 
 	if (!pid_list || !node)
 		return ;
-	if (!*pid_list)
+	if (!*pid_list)   
 	{
 		*pid_list = node;
 		return ;
@@ -110,29 +110,30 @@ int	wait_pids(t_pid *pid_list, pid_t last_pid)
 	return (exit_code);
 }
 
-void	apply_redirs(t_redir *redir)
+void	do_redirs(t_redir *redir)
 {
-	int	fd;
+	int	file;
 
 	while (redir)
 	{
+		file = -1;
 		if (redir->type == R_IN)
-			fd = open(redir->target, O_RDONLY);
+			file = open(redir->target, O_RDONLY);
 		else if (redir->type == R_OUT)
-			fd = open(redir->target,
+			file = open(redir->target,
 					O_CREAT | O_WRONLY | O_TRUNC, 0644);
 		else if (redir->type == APPEND)
-			fd = open(redir->target,
+			file = open(redir->target,
 					O_CREAT | O_WRONLY | O_APPEND, 0644);
 		else if (redir->type == HEREDOC)
-			fd = open(redir->heredoc_tmp, O_RDONLY);
-		if (fd < 0)
+			file = open(redir->heredoc_tmp, O_RDONLY);
+		if (file < 0)
 			exit_if_error(redir->target);
 		if (redir->type == R_IN || redir->type == HEREDOC)
-			dup2(fd, STDIN_FILENO);
+			dup2(file, STDIN_FILENO);
 		else
-			dup2(fd, STDOUT_FILENO);
-		close(fd);
+			dup2(file, STDOUT_FILENO);
+		close(file);
 		redir = redir->next;
 	}
 }

@@ -99,6 +99,9 @@ pid_t	exec_final_command(t_cmd *node, char **envp);
 t_token	*tokenizer(char *line);
 t_token *newtoken(t_toktype type, char *value);
 void	addtoken(t_token **lst, t_token *new);
+//parser
+t_cmd	*parse_line(char *line);
+void	free_cmds(t_cmd *cmds);
 //builtins
 int		isbuiltin(char *s);
 int		checkflag(char *s);
@@ -119,7 +122,7 @@ int		pipeline(t_cmd *cmds, char **env);
 t_cmd	*getg_last_cmd(t_cmd *cmd);
 pid_t	get_last_cmd(t_cmd *cmd, char **env, t_pid **pid_list);
 void	get_middle_cmds(t_cmd *cmds, char **env, t_pid **pid_list);
-void	apply_redirs(t_redir *redir);
+void	do_redirs(t_redir *redir);
 void	pid_add_back(t_pid **pid_list, t_pid *node);
 t_pid	*pid_node(pid_t pid);
 

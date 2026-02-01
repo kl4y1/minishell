@@ -6,18 +6,20 @@
 /*   By: mnajem <mnajem@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/27 21:03:02 by mnajem            #+#    #+#             */
-/*   Updated: 2026/01/30 16:43:25 by mnajem           ###   ########.fr       */
+/*   Updated: 2026/02/02 00:04:30 by mnajem           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-void	exec_command(char **cmd, char **envp)
+void	exec_command(char **cmd, char **envlist)
 {
 	char	**paths;
 	char	*exec_path;
+	char 	**env;
 
-	paths = get_paths(envp);
+	env = listtoarr(envlist);
+	paths = get_paths(env);
 	if (!paths)
 	{
     	exit(1);
@@ -26,7 +28,7 @@ void	exec_command(char **cmd, char **envp)
 	if (!exec_path)
 		exec_path_error(cmd, paths);
 	freesplit(paths);
-	if (execve(exec_path, cmd, envp) == -1)
+	if (execve(exec_path, cmd, env) == -1)
 		error_execve(cmd, exec_path);
 	exit(1);
 }
@@ -37,7 +39,7 @@ void	paf_child_process(t_cmd *node, char **envp, int w_fd)
 	if (dup2(w_fd, STDOUT_FILENO) == -1)
 		exit_if_error("dup2");
 	close(w_fd);
-    apply_redirs(node->redirs);
+    do_redirs(node->redirs);
 	exec_command(node->argv, envp);
 }
 
@@ -73,7 +75,7 @@ pid_t	exec_final_command(t_cmd *node, char **envp)
 		exit_if_error("fork");
 	if (pid == 0)
     {
-        apply_redirs(node->redirs);
+        do_redirs(node->redirs);
 		exec_command(node->argv, envp);
     }
     return pid;

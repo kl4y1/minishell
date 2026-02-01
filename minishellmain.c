@@ -6,11 +6,13 @@
 /*   By: mnajem <mnajem@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/16 20:31:34 by mnajem            #+#    #+#             */
-/*   Updated: 2026/01/30 16:45:29 by mnajem           ###   ########.fr       */
+/*   Updated: 2026/02/02 00:02:08 by mnajem           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
+
+
 
 int main(int argc, char **argv, char **envp)
 {
@@ -19,7 +21,10 @@ int main(int argc, char **argv, char **envp)
     char    *shell;
     t_cmd   *cmds;
     int     status;
+    t_env *env;
 
+    env = envptoenv(envp);
+    status = 0;
     fresh_screen();
     prepare_sig();
 
@@ -36,6 +41,7 @@ int main(int argc, char **argv, char **envp)
         if (shell[0])
         {
             add_history(shell);
+            cmds = parse_line(shell);
         }
         if (cmds)
         {

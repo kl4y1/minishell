@@ -4,7 +4,7 @@ CFLAGS  = -Wall -Wextra -Werror -I.
 NAME    = minishell
 
 SRC     = minishellmain.c mini_parser.c ctrl.c fresh.c utils.c errors.c paths.c \
-			pipework.c pipeworkutils.c tokenizer.c \
+			pipework.c pipeworkutils.c tokenizer.c envutils.c \
 
 OBJ     = $(SRC:.c=.o)
 
