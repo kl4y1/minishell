@@ -5,8 +5,8 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: mnajem <mnajem@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2026/01/27 23:22:21 by mnajem            #+#    #+#             */
-/*   Updated: 2026/02/02 01:42:57 by mnajem           ###   ########.fr       */
+/*   Created: 2026/01/19 23:22:21 by mnajem            #+#    #+#             */
+/*   Updated: 2026/02/04 23:32:13 by mnajem           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,8 @@ t_cmd	*getg_last_cmd(t_cmd *cmd)
 		cmd = cmd->next;
 	return (cmd);
 }
-pid_t	get_last_cmd(t_cmd *cmd, char **env, t_pid **pid_list)
+
+pid_t	get_last_cmd(t_cmd *cmd, t_env **env, t_pid **pid_list)
 {
 	pid_t	pid;
 
@@ -26,7 +27,8 @@ pid_t	get_last_cmd(t_cmd *cmd, char **env, t_pid **pid_list)
 	pid_add_back(pid_list, pid_node(pid));
 	return (pid);
 }
-void	get_middle_cmds(t_cmd *cmds, char **env, t_pid **pid_list)
+
+void	get_middle_cmds(t_cmd *cmds, t_env **env, t_pid **pid_list)
 {
 	t_cmd	*cur;
 	pid_t	pid;
@@ -82,7 +84,7 @@ void free_pid_list(t_pid **pid_list)
     *pid_list = NULL;
 }
 
-int	wait_pids(t_pid *pid_list, pid_t last_pid)
+int	wait_pids(t_pid *pid_list, pid_t last_pid, int *last_stat)
 {
 	int		status;
 	int		exit_code;
@@ -93,24 +95,25 @@ int	wait_pids(t_pid *pid_list, pid_t last_pid)
 	while (cur)
 	{
 		if (waitpid(cur->pid, &status, 0) == -1)
-        {
+		{
 			perror("waitpid");
-            cur = cur->next;
-            continue;
-        }
+			cur = cur->next;
+			continue;
+		}
 		if (cur->pid == last_pid)
 		{
 			if (WIFEXITED(status))
 				exit_code = WEXITSTATUS(status);
 			else if (WIFSIGNALED(status))
 				exit_code = 128 + WTERMSIG(status);
+			*last_stat = exit_code;
 		}
 		cur = cur->next;
 	}
 	return (exit_code);
 }
 
-void	do_redirs(t_redir *redir)
+int	do_redirs(t_redir *redir)
 {
 	int	file;
 
@@ -128,12 +131,30 @@ void	do_redirs(t_redir *redir)
 		else if (redir->type == HEREDOC)
 			file = open(redir->heredoc_tmp, O_RDONLY);
 		if (file < 0)
-			exit_if_error(redir->target);
+		{
+			perror(redir->target);
+			return (1);
+		}
 		if (redir->type == R_IN || redir->type == HEREDOC)
-			dup2(file, STDIN_FILENO);
+		{
+			if (dup2(file, STDIN_FILENO) < 0)
+			{
+				perror("dup2");
+				close(file);
+				return (1);
+			}
+		}
 		else
-			dup2(file, STDOUT_FILENO);
+		{
+			if (dup2(file, STDOUT_FILENO) < 0)
+			{
+				perror("dup2");
+				close(file);
+				return (1);
+			}
+		}
 		close(file);
 		redir = redir->next;
 	}
+	return (0);
 }

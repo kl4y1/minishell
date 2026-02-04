@@ -6,7 +6,7 @@
 /*   By: mnajem <mnajem@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/16 20:31:34 by mnajem            #+#    #+#             */
-/*   Updated: 2026/02/02 00:02:08 by mnajem           ###   ########.fr       */
+/*   Updated: 2026/02/04 04:46:20 by mnajem           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,9 @@ int main(int argc, char **argv, char **envp)
     t_cmd   *cmds;
     int     status;
     t_env *env;
+    int last_stat;
 
+    last_stat = 0;
     env = envptoenv(envp);
     status = 0;
     fresh_screen();
@@ -47,8 +49,23 @@ int main(int argc, char **argv, char **envp)
         {
             int save_in = dup(STDIN_FILENO);
             int save_out = dup(STDOUT_FILENO);
+            int ret;
 
-            status = pipeline(cmds, envp); // envp temporarily
+            ret = -1;
+            if (!cmds->next)
+            {
+                if (do_redirs(cmds->redirs) == 0)
+                    ret = builtin(cmds->argv, &env, last_stat);
+                else
+                    ret = 1;
+            }
+            if (ret == -1)
+                status = pipeline(cmds, &env, &last_stat);
+            else
+            {
+                status = ret;
+                last_stat = ret;
+            }
             dup2(save_in, STDIN_FILENO);
             close(save_in);
             dup2(save_out, STDOUT_FILENO);

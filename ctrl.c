@@ -6,12 +6,12 @@
 /*   By: mnajem <mnajem@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/16 23:31:23 by mnajem            #+#    #+#             */
-/*   Updated: 2026/01/17 01:44:54 by mnajem           ###   ########.fr       */
+/*   Updated: 2026/02/04 20:57:54 by mnajem           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
-
+//locked almost
 volatile sig_atomic_t g_signal = 0;
 
 void sig_ctrl(int sig)
@@ -34,4 +34,10 @@ void prepare_sig(void)
     sigaction(SIGINT,&sa,NULL);
     sa.sa_handler = SIG_IGN;
     sigaction(SIGQUIT, &sa, NULL);
+}
+
+void	reset_signals(void)
+{
+	signal(SIGINT, SIG_DFL);
+	signal(SIGQUIT, SIG_DFL);
 }

@@ -6,12 +6,12 @@
 /*   By: mnajem <mnajem@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/27 15:33:13 by mnajem            #+#    #+#             */
-/*   Updated: 2026/01/27 20:11:01 by mnajem           ###   ########.fr       */
+/*   Updated: 2026/02/04 20:50:34 by mnajem           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
-
+//locked
 int valid_ident(char *s)
 {
     int i;

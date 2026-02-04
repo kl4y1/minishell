@@ -73,6 +73,7 @@ typedef struct s_pid
 //signals
 void fresh_screen(void);
 void prepare_sig(void);
+void reset_signals(void);
 void sig_ctrl(int sig);
 //utils
 void	free_tokenlist(t_token *list);
@@ -91,10 +92,10 @@ void	error_execve(char **cmd, char *execpath);
 void	exit_if_error(char *error);
 void	exit_usage(char *message);
 //exec
-void	exec_command(char **cmd, char **envp);
-void	paf_child_process(t_cmd *node, char **envp, int w_fd);
-pid_t	paf(t_cmd *node, char **envp);
-pid_t	exec_final_command(t_cmd *node, char **envp);
+void	exec_command(char **cmd, t_env **env);
+void	paf_child_process(t_cmd *node, t_env **env, int w_fd);
+pid_t	paf(t_cmd *node, t_env **env);
+pid_t	exec_final_command(t_cmd *node, t_env **env);
 //token
 t_token	*tokenizer(char *line);
 t_token *newtoken(t_toktype type, char *value);
@@ -103,7 +104,7 @@ void	addtoken(t_token **lst, t_token *new);
 t_cmd	*parse_line(char *line);
 void	free_cmds(t_cmd *cmds);
 //builtins
-int		isbuiltin(char *s);
+int		builtin(char **argv, t_env **env, int last_status);
 int		checkflag(char *s);
 int		our_echo(char **argv);
 int		our_pwd(void);
@@ -111,20 +112,30 @@ int		our_env(t_env *env);
 int		valid_ident(char *s);
 void	unset_key(t_env **env, char *key);
 int		our_unset(char **argv, t_env **env);
-int		our_cd(char **argv, t_env **env);
+int		our_cd(t_env *env, char **argv);
 int		our_export(char **argv, t_env **env);
-int		our_exit(char **argv);
+int		our_exit(char **argv, int last_status);
 //pipework
 void	free_pid_list(t_pid **pid_list);
-int		wait_pids(t_pid *pid_list, pid_t last_pid);
-int		pipeline(t_cmd *cmds, char **env);
+int		wait_pids(t_pid *pid_list, pid_t last_pid, int *last_stat);
+int		pipeline(t_cmd *cmds, t_env **env, int *last_stat);
 //pipeworkutils
 t_cmd	*getg_last_cmd(t_cmd *cmd);
-pid_t	get_last_cmd(t_cmd *cmd, char **env, t_pid **pid_list);
-void	get_middle_cmds(t_cmd *cmds, char **env, t_pid **pid_list);
-void	do_redirs(t_redir *redir);
+pid_t	get_last_cmd(t_cmd *cmd, t_env **env, t_pid **pid_list);
+void	get_middle_cmds(t_cmd *cmds, t_env **env, t_pid **pid_list);
+int		do_redirs(t_redir *redir);
 void	pid_add_back(t_pid **pid_list, t_pid *node);
 t_pid	*pid_node(pid_t pid);
+//envutils
+void	env_add_front(t_env **env, t_env *new);
+void	env_free(t_env *env);
+void	env_free_one(t_env *n);
+t_env	*env_new_node(char *s);
+t_env	*envptoenv(char **envp);
+char	**listtoarr(t_env *env);
+void	free_arr(char **arr);
+//cd
+int		count_args(char **av);
 
 
 #endif

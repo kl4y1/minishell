@@ -5,8 +5,8 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: mnajem <mnajem@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2026/01/22 09:07:23 by mnajem            #+#    #+#             */
-/*   Updated: 2026/01/27 15:15:54 by mnajem           ###   ########.fr       */
+/*   Created: 2026/01/17 09:07:23 by mnajem            #+#    #+#             */
+/*   Updated: 2026/02/04 23:32:22 by mnajem           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,6 +23,14 @@ int wout_qlen(char *s,int i,int j)
     quote = 0;
     while(idx<j&&s[idx])
     {
+        if (quote != 39 && s[idx] == '\\')
+        {
+            if (idx + 1 >= j || !s[idx + 1])
+                return (-1);
+            idx += 2;
+            len++;
+            continue;
+        }
         if(quote == 0 && (s[idx] == 34 || s[idx] == 39))
         {
             quote = s[idx];
@@ -52,6 +60,13 @@ int endofword(char *s, int i)
     quote = 0;
     while (s[i])
     {
+        if (quote != 39 && s[i] == '\\')
+        {
+            if (!s[i + 1])
+                return (-1);
+            i += 2;
+            continue;
+        }
         if (quote == 0 && (zspace(s[i]) || s[i] == '|' || s[i] == '<' || s[i] == '>'))
             break;
         if (quote == 0 && (s[i] == 34 || s[i] == 39))
@@ -98,6 +113,17 @@ char *nodevalue(t_toktype type,char *s,int *i)
             return (NULL);
         while (j < endlen)
         {
+            if (quote != 39 && s[j] == '\\')
+            {
+                if (j + 1 >= endlen || !s[j + 1])
+                {
+                    free(word);
+                    return (NULL);
+                }
+                word[idx++] = s[j + 1];
+                j += 2;
+                continue;
+            }
             if(quote == 0&& (s[j] == 34 || s[j] == 39))
             {
                 quote = s[j++];

@@ -6,7 +6,7 @@
 /*   By: mnajem <mnajem@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/27 15:32:34 by mnajem            #+#    #+#             */
-/*   Updated: 2026/02/01 22:44:39 by mnajem           ###   ########.fr       */
+/*   Updated: 2026/02/04 19:33:57 by mnajem           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,15 +26,21 @@ int count_args(char **av)
     return 0;
 }
 
-int our_cd(t_env env,char **argv)
+int	our_cd(t_env *env, char **argv)
 {
-    char *newlo;
-    if(count_args(argv))
-    {
-        perror("TOO MANY ARGS FOR CD");
-        return 0;
-    }
-    
-    
-    
+	(void)env;
+	if (count_args(argv))
+	{
+		ft_putstr_fd("minishell: cd: too many arguments\n", 2);
+		return (1);
+	}
+	if (!argv[1])
+		return (0);
+	if (chdir(argv[1]) == -1)
+	{
+		ft_putstr_fd("minishell: cd: ", 2);
+		perror(argv[1]);
+		return (1);
+	}
+	return (0);
 }
