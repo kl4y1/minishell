@@ -1,30 +1,21 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   pwd.c                                              :+:      :+:    :+:   */
+/*   ft_putchar.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: mnajem <mnajem@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2026/01/27 15:32:47 by mnajem            #+#    #+#             */
-/*   Updated: 2026/01/27 18:03:50 by mnajem           ###   ########.fr       */
+/*   Created: 2025/08/09 14:30:00 by mnajem            #+#    #+#             */
+/*   Updated: 2026/02/09 03:06:31 by mnajem           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "minishell.h"
+#include "libft.h"
 
-// locked
-int	our_pwd(void)
+int	ft_putchar(int c)
 {
-	char	*location;
+	char	ch;
 
-	location = getcwd(NULL, 0);
-	if (!location)
-	{
-		write(2, "Error getting current path", 26);
-		return (1);
-	}
-	ft_putstr_fd(location, 1);
-	write(1, "\n", 1);
-	free(location);
-	return (0);
+	ch = (char)c;
+	return (write(1, &ch, 1));
 }

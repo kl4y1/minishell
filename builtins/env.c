@@ -11,19 +11,20 @@
 /* ************************************************************************** */
 
 #include "minishell.h"
-//locked
-int our_env(t_env *env)
+
+// locked
+int	our_env(t_env *env)
 {
-    while(env)
-    {
-        if(env->key&&env->value)
-        {
-            ft_putstr_fd(env->key,1);
-            write(1,"=",1);
-            ft_putstr_fd(env->value,1);
-            write(1,"\n",1);
-        }
-        env = env->next;
-    }
-    return 0;
+	while (env)
+	{
+		if (env->key && env->value)
+		{
+			ft_putstr_fd(env->key, 1);
+			write(1, "=", 1);
+			ft_putstr_fd(env->value, 1);
+			write(1, "\n", 1);
+		}
+		env = env->next;
+	}
+	return (0);
 }

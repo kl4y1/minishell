@@ -6,12 +6,12 @@
 /*   By: mnajem <mnajem@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/01 12:00:00 by mnajem            #+#    #+#             */
-/*   Updated: 2026/02/01 16:13:51 by mnajem           ###   ########.fr       */
+/*   Updated: 2026/02/09 06:12:45 by mnajem           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
-
+//temp parser untill hamzah is done with his
 static void	free_redirs(t_redir *redir)
 {
 	t_redir	*next;
@@ -122,48 +122,50 @@ static void	cmd_add_back(t_cmd **lst, t_cmd *node)
 	cur->next = node;
 }
 
-static char	*make_heredoc( char *limiter)
+static int	syntax_error(char *msg)
 {
-	char	template[] = "/tmp/minish_heredocXXXXXX";
-	int		fd;
-	char	*line;
-	char	*path;
-
-	fd = mkstemp(template);
-	if (fd < 0)
-		return (NULL);
-	path = ft_strdup(template);
-	if (!path)
-	{
-		close(fd);
-		return (NULL);
-	}
-	while (1)
-	{
-		line = readline("> ");
-		if (!line)
-			break;
-		if (ft_strcmp(line, limiter) == 0)
-		{
-			free(line);
-			break;
-		}
-		write(fd, line, ft_strlen(line));
-		write(fd, "\n", 1);
-		free(line);
-	}
-	close(fd);
-	return (path);
-}
-
-static int	syntax_error( char *msg)
-{
+	write(2, "minishell: ", ft_strlen("minishell: "));
 	write(2, msg, ft_strlen(msg));
 	write(2, "\n", 1);
 	return (0);
 }
 
-static int	count_words_and_validate(t_token *start, int *word_count, int *redir_count)
+static char	*tok_name(t_toktype type)
+{
+	if (type == PIPE)
+		return ("|");
+	if (type == R_IN)
+		return ("<");
+	if (type == R_OUT)
+		return (">");
+	if (type == APPEND)
+		return (">>");
+	if (type == HEREDOC)
+		return ("<<");
+	return ("newline");
+}
+
+static int	syntax_unexpected(t_toktype type)
+{
+	char	*name;
+
+	name = tok_name(type);
+	write(2, "minishell: syntax error near unexpected token `",
+		ft_strlen("minishell: syntax error near unexpected token `"));
+	write(2, name, ft_strlen(name));
+	write(2, "'\n", 2);
+	return (0);
+}
+
+static int	syntax_newline(void)
+{
+	write(2, "minishell: syntax error near unexpected token `newline'\n",
+		ft_strlen("minishell: syntax error near unexpected token `newline'\n"));
+	return (0);
+}
+
+static int	count_words_and_validate(t_token *start, int *word_count,
+		int *redir_count)
 {
 	t_token	*cur;
 
@@ -177,7 +179,11 @@ static int	count_words_and_validate(t_token *start, int *word_count, int *redir_
 		else
 		{
 			if (!cur->next || cur->next->type != WORD)
-				return (syntax_error("syntax error near redirection"));
+			{
+				if (!cur->next)
+					return (syntax_newline());
+				return (syntax_unexpected(cur->next->type));
+			}
 			(*redir_count)++;
 			cur = cur->next;
 		}
@@ -186,7 +192,7 @@ static int	count_words_and_validate(t_token *start, int *word_count, int *redir_
 	return (1);
 }
 
-static t_cmd	*build_cmd(t_token *start)
+static t_cmd	*build_cmd(t_token *start, t_env *env, int last_stat)
 {
 	int		word_count;
 	int		redir_count;
@@ -194,7 +200,12 @@ static t_cmd	*build_cmd(t_token *start)
 	t_redir	*redirs;
 	t_token	*cur;
 	int		i;
+	char	*target;
+	char	*tmp;
+	t_redir	*node;
 
+	(void)env;
+	(void)last_stat;
 	if (!count_words_and_validate(start, &word_count, &redir_count))
 		return (NULL);
 	if (word_count == 0 && redir_count == 0)
@@ -214,28 +225,38 @@ static t_cmd	*build_cmd(t_token *start)
 		{
 			argv[i] = ft_strdup(cur->value);
 			if (!argv[i])
-				return (cleanup_partial(argv, redirs), NULL);
+			{
+				cleanup_partial(argv, redirs);
+				return (NULL);
+			}
 			i++;
 		}
 		else
 		{
-			char	*target = ft_strdup(cur->next->value);
-			char	*tmp = NULL;
+			target = ft_strdup(cur->next->value);
+			tmp = NULL;
 			if (!target)
-				return (cleanup_partial(argv, redirs), NULL);
+			{
+				cleanup_partial(argv, redirs);
+				return (NULL);
+			}
 			if (cur->type == HEREDOC)
 			{
 				tmp = make_heredoc(cur->next->value);
 				if (!tmp)
-					return (cleanup_partial(argv, redirs), NULL);
+				{
+					cleanup_partial(argv, redirs);
+					return (NULL);
+				}
 			}
 			{
-				t_redir	*node = redir_new(cur->type, target, tmp);
+				node = redir_new(cur->type, target, tmp);
 				if (!node)
 				{
 					free(target);
 					free(tmp);
-					return (cleanup_partial(argv, redirs), NULL);
+					cleanup_partial(argv, redirs);
+					return (NULL);
 				}
 				redir_add_back(&redirs, node);
 			}
@@ -246,7 +267,7 @@ static t_cmd	*build_cmd(t_token *start)
 	return (cmd_new(argv, redirs));
 }
 
-t_cmd	*parse_line(char *line)
+t_cmd	*parse_line(char *line, t_env *env, int last_stat)
 {
 	t_token	*tokens;
 	t_token	*cur;
@@ -257,6 +278,11 @@ t_cmd	*parse_line(char *line)
 	tokens = tokenizer(line);
 	if (!tokens)
 		return (NULL);
+	if (expand_tokens(&tokens, env, last_stat))
+	{
+		free_tokenlist(tokens);
+		return (NULL);
+	}
 	cmds = NULL;
 	cur = tokens;
 	segment_start = cur;
@@ -270,7 +296,17 @@ t_cmd	*parse_line(char *line)
 	{
 		if (cur->type == PIPE)
 		{
-			node = build_cmd(segment_start);
+			if (!cur->next || cur->next->type == PIPE)
+			{
+				free_tokenlist(tokens);
+				free_cmds(cmds);
+				if (!cur->next)
+					syntax_newline();
+				else
+					syntax_unexpected(PIPE);
+				return (NULL);
+			}
+			node = build_cmd(segment_start, env, last_stat);
 			if (!node)
 			{
 				free_tokenlist(tokens);
@@ -282,7 +318,7 @@ t_cmd	*parse_line(char *line)
 		}
 		cur = cur->next;
 	}
-	node = build_cmd(segment_start);
+	node = build_cmd(segment_start, env, last_stat);
 	if (!node)
 	{
 		free_tokenlist(tokens);

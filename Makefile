@@ -1,16 +1,26 @@
 CC      = cc
-CFLAGS  = -Wall -Wextra -Werror -I.
+CFLAGS  = -Wall -Wextra -Werror -Iinclude -I.
 
 NAME    = minishell
 
-SRC     = minishellmain.c mini_parser.c ctrl.c fresh.c utils.c errors.c paths.c \
-			pipework.c pipeworkutils.c tokenizer.c envutils.c \
+SRC     = minishellmain.c \
+			parser/mini_parser.c \
+			promptandsigs/ctrl.c promptandsigs/fresh.c \
+			genutils/utils.c genutils/errors.c \
+			excution/pipework.c excution/pipeworkutils.c excution/paths.c \
+			excution/heredoc.c excution/heredocutils.c \
+			tokinizer/tokenizer.c \
+			env/envutils.c \
+			expander/expander.c expander/expander_utils.c \
+			expander/expander_utils2.c expander/expander_utils3.c \
+			expander/expander_utils4.c \
 			builtins/b_utils.c builtins/cd.c builtins/echo.c builtins/env.c \
 			builtins/exit.c builtins/export.c builtins/pwd.c builtins/unset.c
 
 OBJ     = $(SRC:.c=.o)
 
 LIBFT   = libft/libft.a
+HEADERS = include/minishell.h
 
 all: $(NAME)
 
@@ -24,7 +34,7 @@ $(LIBFT):
 	@$(MAKE) -C libft > /dev/null
 	@echo "libft compiled successfully!"
 
-%.o: %.c
+%.o: %.c $(HEADERS)
 	@$(CC) $(CFLAGS) -c $< -o $@
 
 clean:
@@ -37,6 +47,7 @@ fclean: clean
 	@rm -f $(NAME)
 	@$(MAKE) -C libft fclean > /dev/null
 
-re: fclean all
+re: fclean
+	@$(MAKE) all
 
 .PHONY: all clean fclean re

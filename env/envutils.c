@@ -6,13 +6,13 @@
 /*   By: mnajem <mnajem@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/19 01:46:36 by mnajem            #+#    #+#             */
-/*   Updated: 2026/02/04 00:45:01 by mnajem           ###   ########.fr       */
+/*   Updated: 2026/02/08 23:58:30 by mnajem           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
-//needs checking except for new node
 
+// needs checking except for new node
 
 void	env_add_front(t_env **env, t_env *new)
 {
@@ -44,7 +44,6 @@ void	env_free_one(t_env *n)
 	free(n->value);
 	free(n);
 }
-
 
 t_env	*env_new_node(char *s)
 {
@@ -90,7 +89,7 @@ t_env	*envptoenv(char **envp)
 			env_free(env);
 			return (NULL);
 		}
-		env_add_front(&env,new);
+		env_add_front(&env, new);
 		i++;
 	}
 	return (env);
@@ -98,62 +97,65 @@ t_env	*envptoenv(char **envp)
 
 static int	env_size(t_env *env)
 {
-    int	size;
+	int	size;
 
-    size = 0;
-    while (env)
-    {
-        size++;
-        env = env->next;
-    }
-    return (size);
+	size = 0;
+	while (env)
+	{
+		size++;
+		env = env->next;
+	}
+	return (size);
 }
 
 static char	*env_to_str(t_env *node)
 {
-    char	*tmp;
-    char	*result;
+	char	*tmp;
+	char	*result;
 
-    tmp = ft_strjoin(node->key, "=");
-    if (!tmp)
-        return (NULL);
-    result = ft_strjoin(tmp, node->value);
-    free(tmp);
-    return (result);
+	tmp = ft_strjoin(node->key, "=");
+	if (!tmp)
+		return (NULL);
+	result = ft_strjoin(tmp, node->value);
+	free(tmp);
+	return (result);
 }
 
 char	**listtoarr(t_env *env)
 {
-    char	**arr;
-    int		i;
+	char	**arr;
+	int		i;
 
-    arr = malloc(sizeof(char *) * (env_size(env) + 1));
-    if (!arr)
-        return (NULL);
-    i = 0;
-    while (env)
-    {
-        arr[i] = env_to_str(env);
-        if (!arr[i])
-            return (free_arr(arr), NULL);
-        i++;
-        env = env->next;
-    }
-    arr[i] = NULL;
-    return (arr);
+	arr = ft_calloc(env_size(env) + 1, sizeof(char *));
+	if (!arr)
+		return (NULL);
+	i = 0;
+	while (env)
+	{
+		arr[i] = env_to_str(env);
+		if (!arr[i])
+		{
+			free_arr(arr);
+			return (NULL);
+		}
+		i++;
+		env = env->next;
+	}
+	arr[i] = NULL;
+	return (arr);
 }
 
 void	free_arr(char **arr)
 {
-    int	i;
+	int	i;
 
-    if (!arr)
-        return ;
-    i = 0;
-    while (arr[i])
-    {
-        free(arr[i]);
-        i++;
-    }
-    free(arr);
+	if (!arr)
+		return ;
+	i = 0;
+	while (arr[i])
+	{
+		free(arr[i]);
+		i++;
+	}
+	free(arr);
 }

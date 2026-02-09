@@ -12,17 +12,17 @@
 
 #include "minishell.h"
 
-void free_tokenlist(t_token *list)
+void	free_tokenlist(t_token *list)
 {
-    t_token *next;
+	t_token	*next;
 
-    while (list)
-    {
-        next = list->next;
-        free(list->value);
-        free(list);
-        list = next;
-    }
+	while (list)
+	{
+		next = list->next;
+		free(list->value);
+		free(list);
+		list = next;
+	}
 }
 
 char	*join_path(char *path, char *cmd)
@@ -72,18 +72,18 @@ void	waitpids(pid_t child1, pid_t child2)
 	waitpid(child2, NULL, 0);
 }
 
-int zspace(char c)
+int	zspace(char c)
 {
-	if(c <= 32)
-		return 1;
-	return 0;
+	if (c <= 32)
+		return (1);
+	return (0);
 }
 
-int zchar(char c)
+int	zchar(char c)
 {
-	if((c >= 65 && c<=90)||(c>=97 && c<=122))\
-		return 1;
-	return 0;
+	if ((c >= 65 && c <= 90) || (c >= 97 && c <= 122))
+		return (1);
+	return (0);
 }
 
 void	addtoken(t_token **lst, t_token *new)
@@ -105,32 +105,32 @@ void	addtoken(t_token **lst, t_token *new)
 	temp->next = new;
 }
 
-t_token *newtoken(t_toktype type, char *value)
+t_token	*newtoken(t_toktype type, char *value)
 {
-    t_token *new;
+	t_token	*new;
 
-    new = malloc(sizeof(t_token));
-    if (!new)
-        return (NULL);
-    new->type = type;
-    new->value = value;
-    new->next = NULL;
-    return (new);
+	new = malloc(sizeof(t_token));
+	if (!new)
+		return (NULL);
+	new->type = type;
+	new->value = value;
+	new->next = NULL;
+	return (new);
 }
 
-int checkflag(char *s)
+int	checkflag(char *s)
 {
-    int i;
+	int	i;
 
-    if (!s)
-        return (0);
-    i = 0;
-    if (!(s[0] == '-' && s[1] == 'n'))
-        return (0);
-    i = 2;
-    while (s[i] == 'n')
-        i++;
-    if (s[i] == '\0')
-        return (1);
-    return (0);
+	if (!s)
+		return (0);
+	i = 0;
+	if (!(s[0] == '-' && s[1] == 'n'))
+		return (0);
+	i = 2;
+	while (s[i] == 'n')
+		i++;
+	if (s[i] == '\0')
+		return (1);
+	return (0);
 }

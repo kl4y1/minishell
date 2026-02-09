@@ -11,14 +11,15 @@
 /* ************************************************************************** */
 
 #include "minishell.h"
-//locked
-void fresh_screen(void)
-{
-    char *clear;
 
-    if (tgetent(NULL, getenv("TERM")) != 1)
-        return;
-    clear = tgetstr("cl", NULL);
-    if (clear)
-        tputs(clear, 1, putchar);
+// locked
+void	fresh_screen(void)
+{
+	char	*clear;
+
+	if (tgetent(NULL, getenv("TERM")) != 1)
+		return ;
+	clear = tgetstr("cl", NULL);
+	if (clear)
+		tputs(clear, 1, ft_putchar);
 }

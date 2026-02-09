@@ -6,7 +6,7 @@
 /*   By: mnajem <mnajem@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/22 15:47:05 by mnajem            #+#    #+#             */
-/*   Updated: 2026/01/17 19:38:47 by mnajem           ###   ########.fr       */
+/*   Updated: 2026/02/08 23:58:51 by mnajem           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,7 @@ char	**get_paths(char **envp)
 	i = 0;
 	while (envp[i])
 	{
-		if (ft_memcmp(envp[i], "PATH=", 5) == 0)
+		if (ft_strncmp(envp[i], "PATH=", 5) == 0)
 		{
 			path_line = ft_strchr(envp[i], '=') + 1;
 			paths = ft_split(path_line, ':');
