@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ctrl.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mnajem <mnajem@student.42.fr>              +#+  +:+       +#+        */
+/*   By: haabu-sa <haabu-sa@amman.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/16 23:31:23 by mnajem            #+#    #+#             */
-/*   Updated: 2026/02/04 20:57:54 by mnajem           ###   ########.fr       */
+/*   Updated: 2026/02/12 06:21:47 by haabu-sa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,6 +23,7 @@ void	sig_ctrl(int sig)
 	rl_replace_line("", 0);
 	rl_redisplay();
 }
+
 void	prepare_sig(void)
 {
 	struct sigaction	sa;

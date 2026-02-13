@@ -6,7 +6,7 @@
 /*   By: mnajem <mnajem@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/15 20:31:34 by mnajem            #+#    #+#             */
-/*   Updated: 2026/02/09 22:50:05 by mnajem           ###   ########.fr       */
+/*   Updated: 2026/02/12 21:21:47 by mnajem           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,6 +33,8 @@
 # include <sys/wait.h>
 # include <termcap.h>
 # include <unistd.h>
+# include <readline/history.h>
+# include <errno.h>
 
 extern volatile sig_atomic_t	g_signal;
 
@@ -112,14 +114,13 @@ typedef struct s_xtok
 	int							wcount;
 }								t_tok;
 
-typedef int	(*t_bfn)(char **argv, struct s_env **env, int last_status);
+typedef int						(*t_bfn)(char **argv, struct s_env **env, int last_status);
 
 typedef struct s_bentry
 {
 	char	*name;
 	t_bfn	fn;
 }	t_bentry;
-
 
 void							fresh_screen(void);
 void							prepare_sig(void);
@@ -138,11 +139,17 @@ void							exec_path_error(char **cmd, char **paths);
 void							error_execve(char **cmd, char *execpath);
 void							exit_if_error(char *error);
 void							exit_usage(char *message);
+void							close_extra_fds(void);
+void							execve_fail(char *cmd0, char **envp,
+									char *exec_path);
 void							exec_command(char **cmd, t_env **env,
 									int lasts);
-									pid_t							paf(t_cmd *node, t_env **env, int lasts);
-									pid_t							exec_final_command(t_cmd *node, t_env **env,
-										int lasts);
+int								has_slash(char *s);
+char							*load_exec_path(char **cmd, t_env **env,
+									char ***paths, char ***envp);
+pid_t							paf(t_cmd *node, t_env **env, int lasts);
+pid_t							exec_final_command(t_cmd *node, t_env **env,
+									int lasts);
 
 char							*do_expand(char *s, t_env *env, int last_stat,
 									int *had_quotes);
@@ -173,6 +180,7 @@ void							tok_init(t_tok *x, t_token **tokens, t_env *env,
 t_token							*tokenizer(char *line);
 t_token							*newtoken(t_toktype type, char *value);
 void							addtoken(t_token **lst, t_token *new);
+int								validate_tokens(t_token *tokens);
 t_cmd							*parse_line(char *line, t_env *env,
 									int last_stat);
 void							free_cmds(t_cmd *cmds);
@@ -223,5 +231,7 @@ t_env							*envptoenv(char **envp);
 char							**listtoarr(t_env *env);
 void							free_arr(char **arr);
 int								count_args(char **av);
+void							add_redir(t_cmd *cmd, t_toktype type, char *target, char *hd_tmp);
+int								handle_redir(t_cmd *cmd, t_token **tok);
 
 #endif

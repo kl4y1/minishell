@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   tokenizer.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mnajem <mnajem@student.42.fr>              +#+  +:+       +#+        */
+/*   By: haabu-sa <haabu-sa@amman.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/17 09:07:23 by mnajem            #+#    #+#             */
-/*   Updated: 2026/02/09 04:38:19 by mnajem           ###   ########.fr       */
+/*   Updated: 2026/02/12 06:17:20 by haabu-sa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -120,21 +120,21 @@ t_token	*tokenizer(char *line)
 		{
 			type = ident(line, &i);
 			value = nodevalue(type, line, &i);
-				if (type == WORD && !value)
-				{
-					free_tokenlist(tokenlist);
-					ft_putstr_fd("minishell: unclosed quotation\n", 2);
-					return (NULL);
-				}
-				token = newtoken(type, value);
-				if (!token)
-				{
-					free(value);
-					free_tokenlist(tokenlist);
-					return (NULL);
-				}
-				addtoken(&tokenlist, token);
+			if (type == WORD && !value)
+			{
+				free_tokenlist(tokenlist);
+				ft_putstr_fd("minishell: unclosed quotation\n", 2);
+				return (NULL);
 			}
+			token = newtoken(type, value);
+			if (!token)
+			{
+				free(value);
+				free_tokenlist(tokenlist);
+				return (NULL);
+			}
+			addtoken(&tokenlist, token);
 		}
+	}
 	return (tokenlist);
 }

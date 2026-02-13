@@ -6,10 +6,9 @@
 /*   By: mnajem <mnajem@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/05 23:56:01 by mnajem            #+#    #+#             */
-/*   Updated: 2026/02/09 22:41:24 by mnajem           ###   ########.fr       */
+/*   Updated: 2026/02/13 03:02:42 by mnajem           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
-
 
 #include "minishell.h"
 
@@ -67,5 +66,3 @@ t_token	*tok_tail(t_token *node)
 		node = node->next;
 	return (node);
 }
-
-

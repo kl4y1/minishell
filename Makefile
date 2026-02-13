@@ -4,13 +4,15 @@ CFLAGS  = -Wall -Wextra -Werror -Iinclude -I.
 NAME    = minishell
 
 SRC     = minishellmain.c \
-			parser/mini_parser.c \
+			parser/parser.c parser/parser_validate.c \
 			promptandsigs/ctrl.c promptandsigs/fresh.c \
-			genutils/utils.c genutils/errors.c \
-			excution/pipework.c excution/pipeworkutils.c excution/paths.c \
+			genutils/errors.c genutils/utils.c genutils/utils2.c genutils/utils3.c \
+			excution/exec_utils.c excution/pipework.c \
+			excution/pipework_utils.c excution/pipework_utils2.c \
+			excution/redir.c excution/paths.c \
 			excution/heredoc.c excution/heredocutils.c \
 			tokinizer/tokenizer.c \
-			env/envutils.c \
+			env/env.c env/env_utils.c \
 			expander/expander.c expander/expander_utils.c \
 			expander/expander_utils2.c expander/expander_utils3.c \
 			expander/expander_utils4.c \

@@ -6,7 +6,7 @@
 /*   By: mnajem <mnajem@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/22 15:47:05 by mnajem            #+#    #+#             */
-/*   Updated: 2026/02/08 23:58:51 by mnajem           ###   ########.fr       */
+/*   Updated: 2026/02/13 03:00:27 by mnajem           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,4 +53,18 @@ char	*find_exec(char *cmd, char **paths)
 		i++;
 	}
 	return (NULL);
+}
+
+int	has_slash(char *s)
+{
+	int	i;
+
+	i = 0;
+	while (s && s[i])
+	{
+		if (s[i] == '/')
+			return (1);
+		i++;
+	}
+	return (0);
 }

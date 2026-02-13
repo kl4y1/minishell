@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   unset.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mnajem <mnajem@student.42.fr>              +#+  +:+       +#+        */
+/*   By: haabu-sa <haabu-sa@amman.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/27 15:33:13 by mnajem            #+#    #+#             */
-/*   Updated: 2026/02/04 20:50:34 by mnajem           ###   ########.fr       */
+/*   Updated: 2026/02/11 21:57:10 by haabu-sa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,7 +75,9 @@ int	our_unset(char **argv, t_env **env)
 		{
 			if (!valid_ident(argv[i]))
 			{
-				write(2, "unset : invalid identifier\n", 27);
+				ft_putstr_fd("minishell: unset: `", 2);
+				ft_putstr_fd(argv[i], 2);
+				ft_putstr_fd("': not a valid identifier\n", 2);
 				alo = 1;
 			}
 			else
