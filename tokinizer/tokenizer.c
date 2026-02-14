@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   tokenizer.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: haabu-sa <haabu-sa@amman.42.fr>            +#+  +:+       +#+        */
+/*   By: mnajem <mnajem@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/17 09:07:23 by mnajem            #+#    #+#             */
-/*   Updated: 2026/02/12 06:17:20 by haabu-sa         ###   ########.fr       */
+/*   Updated: 2026/02/15 00:35:35 by mnajem           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,38 +14,7 @@
 
 int	endofword(char *s, int i)
 {
-	int	quote;
-
-	quote = 0;
-	while (s[i])
-	{
-		if (quote != 39 && s[i] == '\\')
-		{
-			if (!s[i + 1])
-				return (-1);
-			i += 2;
-			continue ;
-		}
-		if (quote == 0 && (zspace(s[i]) || s[i] == '|' || s[i] == '<'
-				|| s[i] == '>'))
-			break ;
-		if (quote == 0 && (s[i] == 34 || s[i] == 39))
-		{
-			quote = s[i];
-			i++;
-			continue ;
-		}
-		if (quote != 0 && s[i] == quote)
-		{
-			quote = 0;
-			i++;
-			continue ;
-		}
-		i++;
-	}
-	if (quote != 0)
-		return (-1);
-	return (i);
+	return (endofword2(s, i, 0));
 }
 
 char	*nodevalue(t_toktype type, char *s, int *i)
@@ -71,13 +40,8 @@ char	*nodevalue(t_toktype type, char *s, int *i)
 	return (NULL);
 }
 
-t_toktype	ident(char *s, int *i)
+static t_toktype	check_redirect(char *s, int *i)
 {
-	if (s[*i] == '|')
-	{
-		(*i)++;
-		return (PIPE);
-	}
 	if (s[*i] == '<')
 	{
 		if (s[*i + 1] && s[*i + 1] == '<')
@@ -101,40 +65,17 @@ t_toktype	ident(char *s, int *i)
 	return (WORD);
 }
 
+t_toktype	ident(char *s, int *i)
+{
+	if (s[*i] == '|')
+	{
+		(*i)++;
+		return (PIPE);
+	}
+	return (check_redirect(s, i));
+}
+
 t_token	*tokenizer(char *line)
 {
-	int			i;
-	t_token		*tokenlist;
-	t_token		*token;
-	t_toktype	type;
-	char		*value;
-
-	tokenlist = NULL;
-	i = 0;
-	while (line[i])
-	{
-		token = NULL;
-		while (line[i] && zspace(line[i]))
-			i++;
-		if (line[i] && !zspace(line[i]))
-		{
-			type = ident(line, &i);
-			value = nodevalue(type, line, &i);
-			if (type == WORD && !value)
-			{
-				free_tokenlist(tokenlist);
-				ft_putstr_fd("minishell: unclosed quotation\n", 2);
-				return (NULL);
-			}
-			token = newtoken(type, value);
-			if (!token)
-			{
-				free(value);
-				free_tokenlist(tokenlist);
-				return (NULL);
-			}
-			addtoken(&tokenlist, token);
-		}
-	}
-	return (tokenlist);
+	return (tokenizer2(line));
 }

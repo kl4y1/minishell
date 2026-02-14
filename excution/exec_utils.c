@@ -24,12 +24,13 @@ void	close_extra_fds(void)
 	}
 }
 
-void	execve_fail(char *cmd0, char **envp, char *exec_path)
+void	execve_fail(char *cmd0, char **envp, char *exec_path, t_env *env)
 {
 	ft_putstr_fd("minishell: ", 2);
 	perror(cmd0);
 	free_arr(envp);
 	free(exec_path);
+	env_free(env);
 	if (errno == ENOENT)
 		exit(127);
 	exit(126);
@@ -51,7 +52,7 @@ void	exec_command(char **cmd, t_env **env, int last_stat)
 	exec_path = load_exec_path(cmd, env, &paths, &envp);
 	freesplit(paths);
 	if (execve(exec_path, cmd, envp) == -1)
-		execve_fail(cmd[0], envp, exec_path);
+		execve_fail(cmd[0], envp, exec_path, *env);
 	exit(1);
 }
 

@@ -6,7 +6,7 @@
 /*   By: mnajem <mnajem@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/15 20:31:34 by mnajem            #+#    #+#             */
-/*   Updated: 2026/02/12 21:21:47 by mnajem           ###   ########.fr       */
+/*   Updated: 2026/02/15 01:04:34 by mnajem           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -114,7 +114,8 @@ typedef struct s_xtok
 	int							wcount;
 }								t_tok;
 
-typedef int						(*t_bfn)(char **argv, struct s_env **env, int last_status);
+typedef int						(*t_bfn)(char **argv, struct s_env **env,
+									int last_status);
 
 typedef struct s_bentry
 {
@@ -141,7 +142,7 @@ void							exit_if_error(char *error);
 void							exit_usage(char *message);
 void							close_extra_fds(void);
 void							execve_fail(char *cmd0, char **envp,
-									char *exec_path);
+									char *exec_path, t_env *env);
 void							exec_command(char **cmd, t_env **env,
 									int lasts);
 int								has_slash(char *s);
@@ -187,6 +188,14 @@ void							free_cmds(t_cmd *cmds);
 int								builtin(char **argv, t_env **env,
 									int last_status);
 int								is_builtin_cmd(char *cmd);
+t_bentry						*builtin_table(void);
+t_bfn							find_builtin(char *cmd);
+int								b_cd(char **argv, t_env **env,
+									int last_status);
+int								b_export(char **argv, t_env **env,
+									int last_status);
+int								b_exit(char **argv, t_env **env,
+									int last_status);
 int								checkflag(char *s);
 int								our_echo(char **argv);
 int								our_pwd(void);
@@ -196,6 +205,15 @@ void							unset_key(t_env **env, char *key);
 int								our_unset(char **argv, t_env **env);
 int								our_cd(t_env *env, char **argv);
 int								our_export(char **argv, t_env **env);
+int								export_valid_ident(char *arg);
+char							*export_key(char *arg);
+int								export_add_new(char *key, char *arg,
+									t_env **env);
+int								env_count(t_env *env);
+void							sort_env_arr(t_env **arr, int n);
+void							print_export(t_env *env);
+int								export_error(char *arg);
+int								process_arg(char *arg, t_env **env);
 int								our_exit(char **argv, int last_status);
 void							printnonnumer(char *s);
 char							*find_key(char *s);
@@ -231,7 +249,30 @@ t_env							*envptoenv(char **envp);
 char							**listtoarr(t_env *env);
 void							free_arr(char **arr);
 int								count_args(char **av);
-void							add_redir(t_cmd *cmd, t_toktype type, char *target, char *hd_tmp);
+void							add_redir(t_cmd *cmd, t_toktype type,
+									char *target, char *hd_tmp);
 int								handle_redir(t_cmd *cmd, t_token **tok);
+void							restore_fds(int save_in, int save_out);
+int								exec_cmds(t_cmd *cmds, t_env **env,
+									int *last_stat);
+int								process_command(char *shell, t_env **env,
+									int *last_stat);
+int								main_loop(t_env *env, int *status);
+void							handle_input(char *shell, int *last_stat);
+t_cmd							*parse_input(char *shell, t_env *env,
+									int *last_stat);
+int								endofword2(char *s, int i, int quote);
+int								endofword(char *s, int i);
+char							*nodevalue(t_toktype type, char *s, int *i);
+t_toktype						ident(char *s, int *i);
+t_token							*handle_word_token(char *line, int *i,
+									t_token *tokenlist);
+t_token							*tokenizer2(char *line);
+t_cmd							*parse_line2(char *line, t_env *env,
+									int last_stat);
+t_cmd							*new_cmd(void);
+void							add_argv(t_cmd *cmd, char *arg);
+t_cmd							*parse_tokens2(t_token *tokens);
+int								validate_tokens2(t_token *tokens);
 
 #endif

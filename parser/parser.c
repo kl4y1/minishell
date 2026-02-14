@@ -3,16 +3,16 @@
 /*                                                        :::      ::::::::   */
 /*   parser.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: haabu-sa <haabu-sa@amman.42.fr>            +#+  +:+       +#+        */
+/*   By: mnajem <mnajem@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/09 19:43:28 by haabu-sa          #+#    #+#             */
-/*   Updated: 2026/02/12 06:12:20 by haabu-sa         ###   ########.fr       */
+/*   Updated: 2026/02/15 00:56:01 by mnajem           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-static t_cmd	*new_cmd(void)
+t_cmd	*new_cmd(void)
 {
 	t_cmd	*cmd;
 
@@ -25,7 +25,7 @@ static t_cmd	*new_cmd(void)
 	return (cmd);
 }
 
-static void	add_argv(t_cmd *cmd, char *arg)
+void	add_argv(t_cmd *cmd, char *arg)
 {
 	int		count;
 	char	**new_argv;
@@ -77,55 +77,10 @@ void	add_redir(t_cmd *cmd, t_toktype type, char *target, char *hd_tmp)
 
 t_cmd	*parse_tokens(t_token *tokens)
 {
-	t_cmd	*head;
-	t_cmd	*cur;
-
-	head = NULL;
-	cur = NULL;
-	while (tokens)
-	{
-		if (!cur)
-		{
-			cur = new_cmd();
-			if (!cur)
-				return (free_cmds(head), NULL);
-			if (!head)
-				head = cur;
-		}
-		if (tokens->type == WORD)
-			add_argv(cur, tokens->value);
-		else if (tokens->type == PIPE)
-		{
-			cur->next = new_cmd();
-			cur = cur->next;
-		}
-		else if (handle_redir(cur, &tokens))
-			return (free_cmds(head), NULL);
-		if (tokens)
-			tokens = tokens->next;
-	}
-	return (head);
+	return (parse_tokens2(tokens));
 }
 
 t_cmd	*parse_line(char *line, t_env *env, int last_stat)
 {
-	t_token	*tokens;
-	t_cmd	*cmds;
-
-	tokens = tokenizer(line);
-	if (!tokens)
-		return (NULL);
-	if (validate_tokens(tokens))
-	{
-		free_tokenlist(tokens);
-		return (NULL);
-	}
-	if (expand_tokens(&tokens, env, last_stat))
-	{
-		free_tokenlist(tokens);
-		return (NULL);
-	}
-	cmds = parse_tokens(tokens);
-	free_tokenlist(tokens);
-	return (cmds);
+	return (parse_line2(line, env, last_stat));
 }
